@@ -51,12 +51,13 @@ def pad_string(to_pad, pad_len, pad_char=" ", truncate=False):
 def show_inputs(logger, args):
     """For debug, show the inputs"""
     _msg = "Input arguments:\n\n"
-
+    _pad_len = 30
+    
     for arg in vars(args):
         if arg == "pwd":
-            _msg += "  %s: **********\n" % pad_string(arg, 15)
+            _msg += "  %s: **********\n" % pad_string(arg, _pad_len)
         else:
-            _msg += "  %s: %s\n" % (pad_string(arg, 15), getattr(args, arg))
+            _msg += "  %s: %s\n" % (pad_string(arg, _pad_len), getattr(args, arg))
 
     logger.debug(_msg)
 

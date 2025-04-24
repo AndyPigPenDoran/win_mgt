@@ -8,7 +8,7 @@ from utilities import CustomFormatter, get_password, show_inputs
 
 # If pypsrp is not present, this import will fail
 try:
-    import transport_pypsrp as p
+    from transport_pypsrp import Transport
     HAS_PYPSRP = True
     IMPORT_ERROR = None
 except ImportError as e:
@@ -21,14 +21,25 @@ def main():
     logger.info("Starting")
 
     # If the password is not entered then ask for it
-    password = get_password(args.user, args.pwd)
+    password = get_password(args.username, args.pwd)
 
     # If the password is still empty then we cannot carry on
     if password is None or len(password) == 0:
         logger.error("No password was supplied for user: %s", args.user)
         return
+    
     show_inputs(logger, args)
 
+    # Set up transport
+    transport = Transport(logger, args, password)
+
+    # Establish a connection
+    transport.connect()
+
+    if not transport.connected:
+        logger.warning("Connection failed, exiting procedure")
+        return
+    
     
 if __name__ == "__main__":
     # First process arguments

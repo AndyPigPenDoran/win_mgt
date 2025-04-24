@@ -9,7 +9,7 @@ def args_positional(parser):
 
 def args_credentials(parser):
     """Arguments related to credentials"""
-    parser.add_argument("-user", help="username", type=str, required=True)
+    parser.add_argument("-user", help="username", type=str, required=True, dest="username")
     parser.add_argument("-pwd", help="password", type=str)
 
 def args_connect(parser):
@@ -21,13 +21,27 @@ def args_connect(parser):
     parser.add_argument("-port", help="port", type=int)
     parser.add_argument(
         "--msg-encryption", help="message encryption", type=str.lower, 
-        choices=c.CHOICES_MSG_ENCRYPTION, default=c.DEFAULT_MSG_ENCRYPTION
+        choices=c.CHOICES_MSG_ENCRYPTION, default=c.DEFAULT_MSG_ENCRYPTION,
+        dest="encryption"
     )
     parser.add_argument(
         "-v", "--cert-validate", help="certificate validation", action="store_true",
-        dest="cert_validate"
+        dest="cert_validation"
+    )
+    parser.add_argument(
+        "--operation-timeout", help="operation timeout", type=int, 
+        default=c.DEFAULT_PYPSRP_ARGS["operation_timeout"]
+    )
+    parser.add_argument(
+        "--read-timeout", help="read timeout", type=int,
+        default=c.DEFAULT_PYPSRP_ARGS["read_timeout"]
+    )
+    parser.add_argument(
+        "--connection-timeout", help="connection timeout", type=int,
+        default=c.DEFAULT_PYPSRP_ARGS["connection_timeout"]
     )
 
 def args_optional(parser):
     """Arguments that are optional"""
+    parser.add_argument("-n", help="do not ping target", action="store_false", dest="ping")
     parser.add_argument("-d", help="enable debug logging", action="store_true", dest="debug")
