@@ -29,13 +29,13 @@ class Network:
     def _is_ip(self, host):
         """See if this is IP - and whether it is IPv6"""
         # Test for IPv6 first
-        if _is_ipv6:
+        if _is_ipv6(host):
             self.host_info["ip"] = host
             self.host_info["is_ipv6"] = True
             return
         
         # Now test for IPv4
-        if _is_ipv4:
+        if _is_ipv4(host):
             self.host_info["ip"] = host
             self.host_info["is_ipv6"] = False
             return
@@ -67,18 +67,25 @@ class Network:
     
     def ping_host(self, port):
         """Attempt to ping a device"""
-        self.logger.debug(
-            "network.ping_host: Attempt to ping %s on port %s", 
-            self.host_info["host"], port
-        )
 
         # Should the ping be IPv6 or IPv4
         family = socket.AF_INET6 if self.host_info["is_ipv6"] else socket.AF_INET
         sock = socket.socket(family)
-        r = sock.connect_ex((self.host_info["ip"], port))
-        sock.close()
+        r = None
 
-        if r and r !=0:
+        try:
+            r = sock.connect_ex((self.host_info["ip"], port))
+        except socket.gaierror as e:
+            self.logger.error(
+                "Error in ping test: %s", str(e)
+            )
+            self.logger.debug("Host info: %s", self.host_info)
+        finally:
+            sock.close()
+
+        if r is not None and int(r) == 0:
+            return True
+        else:
             self.logger.debug(
                 "network.ping_test: Ping failed with code: %s", r
             )

@@ -41,6 +41,14 @@ def args_connect(parser):
         default=c.DEFAULT_PYPSRP_ARGS["connection_timeout"]
     )
 
+def args_kerberos(parser):
+    """Kerberos related"""
+    parser.add_argument("--kinit-timeout", help="kinit timeout", type=int, default=10)
+    parser.add_argument(
+        "--force-cache", help="force the use of a cache file for kerberos ticket", 
+        action="store_true"
+    )
+
 def args_optional(parser):
     """Arguments that are optional"""
     parser.add_argument("-n", help="do not ping target", action="store_false", dest="ping")

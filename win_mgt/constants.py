@@ -6,12 +6,13 @@ CHOICES_TASKS = {
 }
 
 # Connection options
-CHOICES_PROTOCOLS = ["HTTP", "HTTPS"]
-DEFAULT_PROTOCOL = "HTTP"
+PROTOCOL_HTTP, PROTOCOL_HTTPS = ("HTTP", "HTTPS")
+CHOICES_PROTOCOLS = [PROTOCOL_HTTP, PROTOCOL_HTTPS]
+DEFAULT_PROTOCOL = PROTOCOL_HTTP
 
 DEFAULT_PORTS = {
-    "HTTP": 5985,
-    "HTTPS": 5986
+    PROTOCOL_HTTP: 5985,
+    PROTOCOL_HTTPS: 5986
 }
 
 MSG_ENCRYPTION_AUTO, MSG_ENCRYPTION_NEVER, MSG_ENCRYPTION_ALWAYS = ("auto", "never", "always")
@@ -55,3 +56,8 @@ DEFAULT_PYPSRP_ARGS = {
     "negotiate_send_cbt": True, #Whether to binding the channel binding token (HTTPS only) to the auth or ignore, default is True
     "negotiate_service": "HTTP" #Override the service part of the calculated SPN used when authenticating the server, default is WSMAN. This is only valid if negotiate auth negotiated Kerberos or kerberos was explicitly set
 }
+
+# Kerberos constants
+KRB_KINIT_OK = 0
+KRB_RETRY_CACHE = 1
+KRB_FAIL = 2
