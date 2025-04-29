@@ -44,14 +44,14 @@ def main():
     transport = Transport(logger, args, password)
 
     # Establish a connection
-    transport.connect(True)
+    transport.connect()
 
     if not transport.connected:
         logger.warning("Connection failed, exiting procedure")
         return
     
     # Run the command
-    run_ok = transport.run_command("path")
+    run_ok = transport.run_command("Get-Service")
     # For Client connection, we will reset connected and give an error if there is an issue. This
     # is because the "connect" doesn;t really connect, the command execution does. So verigy we
     # are connected first
