@@ -16,9 +16,25 @@ class Kerberos:
         self.cache = ""
 
 
+    def _check_result(self, rc, r_out, r_err):
+        """Check the result of the kinit"""
+
+        stdout = r_out.decode("utf-8") if type(r_out) == bytes else r_out
+        stderr = r_err.decode("utf-8") if type(r_err) == bytes else r_err
+        self.logger.debug("rc: %s, err: %s, out: %s", rc, stderr, stdout)
+
+        if int(rc) == 0 and len(stderr) == 0:
+            return c.KRB_KINIT_OK
+        else:
+            self.logger.warning(
+                "Issue obtaining a kerberos ticket, return code: %s, error: %s", rc, stderr
+            )
+            return c.KRB_FAIL
+    
+
     def _kinit(self, password, use_cache=False):
         """Run the kinit command"""
-        user_string = "%s%s" % (self.principal, self.domain)
+        user_string = "%s@%s" % (self.principal, self.domain)
 
         try:
             if use_cache:
@@ -48,12 +64,14 @@ class Kerberos:
             else:
                 _stdout, _stderr = ph.communicate(password)
 
-            if use_cache:
+            ok = self._check_result(ph.returncode, _stdout, _stderr)
+            if use_cache and ok == c.KRB_KINIT_OK:
                 os.environ["KRB5CCNAME"] = self.cache
             else:
-                os.environ["KRB5CCNAME"] = ""
+                if "KRB5CCNAME" in os.environ:
+                    del os.environ["KRB5CCNAME"]
 
-            return c.KRB_KINIT_OK
+            return ok
         except subprocess.TimeoutExpired:
             self.logger.error(
                 "Reached maimum timeout (%s seconds) waiting for a response from the Domain " \

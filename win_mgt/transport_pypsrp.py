@@ -71,6 +71,8 @@ class Transport:
             self.principal = _principal
             self.domain = _domain.upper()
             self.kwargs["auth"] = c.PYPSRP_KERBEROS
+            # Make sure user is in correct format with uppercase domain
+            self.kwargs["username"] = "%s@%s" % (self.principal, self.domain)
         else:
             # Local - can't use message encryption, so override any choice mad
             self.kwargs["auth"] = c.PYPSRP_BASIC
