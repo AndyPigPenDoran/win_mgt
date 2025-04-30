@@ -1,10 +1,14 @@
 import constants as c
+import json
 
 def args_positional(parser):
     """Positional arguments"""
     parser.add_argument("server", help="Windows server to manage", type=str)
     parser.add_argument(
         "task", help="task to perform", type=str.lower, choices=c.CHOICES_TASKS.keys()
+    )
+    parser.add_argument(
+        "option", help="specific command for task", type=str.lower,
     )
 
 def args_credentials(parser):
@@ -39,6 +43,12 @@ def args_connect(parser):
     parser.add_argument(
         "--connection-timeout", help="connection timeout", type=int,
         default=c.DEFAULT_PYPSRP_ARGS["connection_timeout"]
+    )
+
+def args_command(parser):
+    """Options relating to the command"""
+    parser.add_argument(
+        "--task-options", help="task specific options", type=json.loads
     )
 
 def args_kerberos(parser):

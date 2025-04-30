@@ -1,9 +1,33 @@
 
 CHOICES_TASKS = {
-    "shutdown": {},
-    "services": {},
+    "shutdown": {
+        "restart-now": {
+            "command_type_raw": True,
+            "command": "shutdown -r -t 0 -f",
+            "has_options": False
+        }
+    },
+    "services": {
+        "list": {
+            "command_type_raw": False,
+            "command": "Get-Service",
+            "has_options": False        
+        },
+        "restart": {
+            "command_type_raw": False,
+            "command": "Restart-Service",
+            "has_options": True,
+            "option_list": {
+                "-Name": {
+                    "type": str,
+                    "required": True
+                }
+            }
+        }
+    },
     "filesystem": {}
 }
+
 
 # Connection options
 PROTOCOL_HTTP, PROTOCOL_HTTPS = ("HTTP", "HTTPS")
