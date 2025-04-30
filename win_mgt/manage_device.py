@@ -5,6 +5,7 @@ import logging
 import constants as c
 import argument_defs
 from utilities import CustomFormatter, get_password, show_inputs
+from command_builder import CommandBuilder
 
 # If pypsrp is not present, this import will fail
 try:
@@ -25,7 +26,6 @@ def process_results(is_ok, result_dict):
         msg = "Command Error:\n\n%s\n" % result_dict["stderr"]
         logger.warning(msg)
 
-
 def main():
     """Main routine starting point"""
     logger.info("Starting")
@@ -40,20 +40,28 @@ def main():
     
     show_inputs(logger, args)
 
+    # Build command
+    commander = CommandBuilder(logger, args)
+    command_detail = commander.get_command()
+    
+    if command_detail is None or not commander.ok:
+        return
+
     # Set up transport
     transport = Transport(logger, args, password)
 
     # Establish a connection
-    transport.connect()
+    transport.connect(command_detail["command_type_raw"])
+
 
     if not transport.connected:
         logger.warning("Connection failed, exiting procedure")
         return
     
     # Run the command
-    run_ok = transport.run_command("Get-Service")
+    run_ok = transport.run_command(command_detail["command"])
     # For Client connection, we will reset connected and give an error if there is an issue. This
-    # is because the "connect" doesn;t really connect, the command execution does. So verigy we
+    # is because the "connect" doesn;t really connect, the command execution does. So verify we
     # are connected first
 
     if not transport.connected:
@@ -92,6 +100,10 @@ if __name__ == "__main__":
     # Optional arguments
     optional_parser = parser.add_argument_group("additional settings")
     argument_defs.args_optional(optional_parser)
+
+    # Options for the task
+    to_parser = parser.add_argument_group("task options")
+    argument_defs.args_command(to_parser)
 
     args = parser.parse_args()
 
